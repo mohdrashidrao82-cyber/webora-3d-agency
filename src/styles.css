@@ -1,0 +1,615 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Float, Text, Html } from '@react-three/drei';
+import {
+  FaArrowRight,
+  FaCheck,
+  FaChevronRight,
+  FaDesktop,
+  FaEnvelope,
+  FaFacebookF,
+  FaInstagram,
+  FaMapMarkerAlt,
+  FaPhoneAlt,
+  FaRocket,
+  FaSearch,
+  FaStar,
+  FaTachometerAlt,
+  FaWhatsapp,
+  FaGlobe,
+  FaLaptopCode,
+  FaStore,
+  FaUtensils,
+  FaShoppingBag,
+  FaPaintBrush,
+  FaSyncAlt,
+  FaChartLine,
+  FaUsers,
+  FaMobileAlt,
+  FaArrowUp
+} from 'react-icons/fa';
+
+const navItems = ['Home', 'Services', 'Portfolio', 'Pricing', 'Contact'];
+
+const services = [
+  {
+    title: 'Business Websites',
+    desc: 'Professional websites that build trust, communicate your value and turn visitors into customers.',
+    icon: <FaDesktop />
+  },
+  {
+    title: 'Restaurant & Café Websites',
+    desc: 'Elegant digital storefronts for food brands that need strong menus, reservations and location visibility.',
+    icon: <FaUtensils />
+  },
+  {
+    title: 'E-commerce Websites',
+    desc: 'Convert more sales with beautifully designed stores that are optimized for mobile and customer trust.',
+    icon: <FaShoppingBag />
+  },
+  {
+    title: 'Landing Pages',
+    desc: 'Focused campaign pages built to generate leads, enquiries and calls for your business quickly.',
+    icon: <FaRocket />
+  },
+  {
+    title: 'Portfolio Websites',
+    desc: 'Showcase your work, expertise and brand story with a premium portfolio presentation.',
+    icon: <FaPaintBrush />
+  },
+  {
+    title: 'Website Redesign',
+    desc: 'Refresh a dated website into something modern, faster and more persuasive for real business growth.',
+    icon: <FaSyncAlt />
+  }
+];
+
+const featureCards = [
+  { title: 'Modern Design', icon: <FaStar />, text: 'Luxury visuals that elevate your brand image and create instant credibility.' },
+  { title: 'Mobile Responsive', icon: <FaMobileAlt />, text: 'Optimized for every screen so your website looks polished on phone, tablet and desktop.' },
+  { title: 'Fast Loading', icon: <FaTachometerAlt />, text: 'Performance-focused builds that keep your visitors engaged and improve user experience.' },
+  { title: 'SEO Friendly', icon: <FaSearch />, text: 'Clean structure and strategic content that helps people find your business online.' },
+  { title: 'WhatsApp Integration', icon: <FaWhatsapp />, text: 'Turn leads into quick conversations with an instant WhatsApp enquiry option.' },
+  { title: 'Easy to Manage', icon: <FaGlobe />, text: 'Simple updates and easy content management so your site stays fresh and current.' }
+];
+
+const portfolioProjects = [
+  {
+    name: 'Luxury Restaurant',
+    tag: 'Fine Dining',
+    accent: '#ffb26b'
+  },
+  {
+    name: 'Modern Bakery',
+    tag: 'Retail & Food',
+    accent: '#8ec5ff'
+  },
+  {
+    name: 'Fashion Store',
+    tag: 'Boutique',
+    accent: '#f3b4ff'
+  },
+  {
+    name: 'Real Estate',
+    tag: 'Property',
+    accent: '#9ef3d1'
+  },
+  {
+    name: 'Café',
+    tag: 'Hospitality',
+    accent: '#ffc75f'
+  },
+  {
+    name: 'Salon',
+    tag: 'Beauty',
+    accent: '#bca7ff'
+  }
+];
+
+const pricingPlans = [
+  {
+    name: 'Starter',
+    price: '₹4,999',
+    featured: false,
+    features: ['1–3 pages', 'Responsive design', 'WhatsApp button', 'Contact form']
+  },
+  {
+    name: 'Business',
+    price: '₹9,999',
+    featured: true,
+    features: ['Up to 7 pages', 'Premium design', 'WhatsApp integration', 'Google Maps', 'Basic SEO']
+  },
+  {
+    name: 'Premium',
+    price: '₹19,999',
+    featured: false,
+    features: ['Custom premium website', 'Advanced animations', 'E-commerce functionality', 'SEO setup', 'Priority support']
+  }
+];
+
+const steps = [
+  'Tell Us About Your Business',
+  'We Design Your Website',
+  'You Review & Approve',
+  'Your Website Goes Live'
+];
+
+function useScrollReveal() {
+  useEffect(() => {
+    const elements = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+          }
+        });
+      },
+      { threshold: 0.16 }
+    );
+
+    elements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
+}
+
+function FloatingScene() {
+  const group = useRef();
+
+  useFrame((state) => {
+    if (!group.current) return;
+    group.current.rotation.y = state.clock.elapsedTime * 0.26;
+    group.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.85) * 0.12;
+  });
+
+  return (
+    <group ref={group}>
+      <Float speed={2.1} rotationIntensity={0.8} floatIntensity={1.3}>
+        <mesh position={[0, 0.2, 0]}>
+          <boxGeometry args={[3.4, 2.1, 0.16]} />
+          <meshStandardMaterial color="#151d2d" metalness={0.5} roughness={0.2} />
+        </mesh>
+        <mesh position={[0, 0.18, 0.09]}>
+          <planeGeometry args={[3.08, 1.82]} />
+          <meshStandardMaterial color="#0b1321" emissive="#0d1730" emissiveIntensity={0.3} />
+        </mesh>
+        <mesh position={[0, -1.35, 0.1]}>
+          <boxGeometry args={[3.7, 0.3, 0.36]} />
+          <meshStandardMaterial color="#10182a" metalness={0.75} roughness={0.18} />
+        </mesh>
+        <mesh position={[0.12, -1.4, 0.25]}>
+          <boxGeometry args={[0.45, 0.1, 0.45]} />
+          <meshStandardMaterial color="#0b0f18" emissive="#4cc9f0" emissiveIntensity={0.18} />
+        </mesh>
+
+        <group position={[-1.1, 0.5, 0.25]}>
+          <mesh>
+            <boxGeometry args={[0.72, 0.4, 0.1]} />
+            <meshStandardMaterial color="#17283d" emissive="#78e1ff" emissiveIntensity={0.2} />
+          </mesh>
+          <mesh position={[0.1, -0.02, 0.06]}>
+            <boxGeometry args={[0.46, 0.22, 0.02]} />
+            <meshStandardMaterial color="#a5d8ff" emissive="#84d2ff" emissiveIntensity={0.6} />
+          </mesh>
+        </group>
+
+        <group position={[1.12, 0.46, 0.25]}>
+          <mesh>
+            <boxGeometry args={[0.8, 0.48, 0.12]} />
+            <meshStandardMaterial color="#1a2539" emissive="#8ef2d6" emissiveIntensity={0.2} />
+          </mesh>
+          <mesh position={[0.08, -0.05, 0.07]}>
+            <boxGeometry args={[0.52, 0.28, 0.03]} />
+            <meshStandardMaterial color="#d9fff5" emissive="#8ef2d6" emissiveIntensity={0.8} />
+          </mesh>
+        </group>
+      </Float>
+
+      <Float speed={1.7} rotationIntensity={1.2} floatIntensity={1.8} position={[2.2, 1.2, -1.3]}>
+        <mesh>
+          <icosahedronGeometry args={[0.42, 0]} />
+          <meshStandardMaterial color="#a855f7" emissive="#7c3aed" emissiveIntensity={0.8} />
+        </mesh>
+      </Float>
+
+      <Float speed={1.5} rotationIntensity={1.1} floatIntensity={1.6} position={[-2.2, -1.1, -1.2]}>
+        <mesh>
+          <octahedronGeometry args={[0.38, 0]} />
+          <meshStandardMaterial color="#2dd4bf" emissive="#14b8a6" emissiveIntensity={0.8} />
+        </mesh>
+      </Float>
+
+      <Float speed={1.4} rotationIntensity={1.3} floatIntensity={1.7} position={[0, 2.2, -1.6]}>
+        <mesh>
+          <torusGeometry args={[0.8, 0.08, 16, 100]} />
+          <meshStandardMaterial color="#6ee7ff" emissive="#67e8f9" emissiveIntensity={0.8} />
+        </mesh>
+      </Float>
+    </group>
+  );
+}
+
+function HeroScene() {
+  return (
+    <Canvas camera={{ position: [0, 0, 6], fov: 38 }}>
+      <ambientLight intensity={0.9} />
+      <directionalLight position={[5, 4, 5]} intensity={1.15} color="#e5f3ff" />
+      <spotLight position={[-4, 3, 3]} intensity={1.2} angle={0.35} penumbra={1} color="#7dd3fc" />
+      <FloatingScene />
+    </Canvas>
+  );
+}
+
+function App() {
+  const [activeTab, setActiveTab] = useState('Home');
+  const [formData, setFormData] = useState({
+    name: '',
+    businessName: '',
+    businessType: '',
+    phone: '',
+    need: '',
+    message: ''
+  });
+  const [submitted, setSubmitted] = useState(false);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const heroRef = useRef(null);
+
+  useScrollReveal();
+
+  const whatsappLink = useMemo(
+    () =>
+      'https://wa.me/919876543210?text=' +
+      encodeURIComponent('Hi Webora 3D, I want to build a premium website for my business. Can we discuss my project?'),
+    []
+  );
+
+  const handlePointerMove = (event) => {
+    const rect = heroRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const x = (event.clientX - rect.left) / rect.width;
+    const y = (event.clientY - rect.top) / rect.height;
+
+    setTilt({
+      x: (0.5 - y) * 12,
+      y: (x - 0.5) * 18
+    });
+  };
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setSubmitted(true);
+  };
+
+  return (
+    <div className="app-shell">
+      <div className="background-glow glow-one" />
+      <div className="background-glow glow-two" />
+
+      <header className="topbar">
+        <div className="container nav-wrap">
+          <a className="brand" href="#home" aria-label="Webora 3D home">
+            <span className="brand-mark">W</span>
+            <span>Webora 3D</span>
+          </a>
+
+          <nav className="nav" aria-label="Main navigation">
+            {navItems.map((item) => (
+              <a
+                key={item}
+                href={`#${item === 'Home' ? 'home' : item.toLowerCase()}`}
+                className={activeTab === item ? 'nav-link active' : 'nav-link'}
+                onClick={() => setActiveTab(item)}
+              >
+                {item}
+              </a>
+            ))}
+          </nav>
+
+          <a className="nav-cta" href="#contact">
+            Book a Call
+          </a>
+        </div>
+      </header>
+
+      <main>
+        <section id="home" className="hero">
+          <div className="container hero-grid">
+            <div className="hero-copy reveal">
+              <div className="eyebrow">Web Design Studio</div>
+              <h1>We Build Websites That Grow Businesses.</h1>
+              <p>
+                Premium websites designed to make your business look professional, attract customers and grow online.
+              </p>
+              <div className="hero-actions">
+                <a className="primary-btn" href="#contact">
+                  Get Your Website
+                  <FaArrowRight />
+                </a>
+                <a className="secondary-btn" href="#portfolio">
+                  View Our Work
+                </a>
+              </div>
+              <div className="hero-metrics">
+                <div>
+                  <strong>120+</strong>
+                  <span>Projects launched</span>
+                </div>
+                <div>
+                  <strong>3x</strong>
+                  <span>Lead growth</span>
+                </div>
+                <div>
+                  <strong>4.9/5</strong>
+                  <span>Client rating</span>
+                </div>
+              </div>
+            </div>
+
+            <div
+              className="hero-visual reveal"
+              ref={heroRef}
+              onMouseMove={handlePointerMove}
+              onMouseLeave={() => setTilt({ x: 0, y: 0 })}
+              style={{ transform: `perspective(1200px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` }}
+            >
+              <div className="orb orb-one" />
+              <div className="orb orb-two" />
+              <div className="orb orb-three" />
+              <div className="scene-frame">
+                <HeroScene />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="services" className="section-wrap reveal">
+          <div className="container">
+            <div className="section-head">
+              <span className="eyebrow">Our Services</span>
+              <h2>Built to elevate your brand and convert more customers.</h2>
+            </div>
+
+            <div className="services-grid">
+              {services.map((service) => (
+                <article className="service-card glass-card" key={service.title}>
+                  <div className="service-icon">{service.icon}</div>
+                  <h3>{service.title}</h3>
+                  <p>{service.desc}</p>
+                  <a href="#contact">
+                    Learn more <FaChevronRight />
+                  </a>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="section-wrap reveal">
+          <div className="container">
+            <div className="section-head">
+              <span className="eyebrow">Why Choose Us</span>
+              <h2>Premium execution backed by business-first thinking.</h2>
+            </div>
+
+            <div className="features-grid">
+              {featureCards.map((feature) => (
+                <div className="feature-card glass-card" key={feature.title}>
+                  <div className="feature-icon">{feature.icon}</div>
+                  <h3>{feature.title}</h3>
+                  <p>{feature.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="portfolio" className="section-wrap reveal">
+          <div className="container">
+            <div className="section-head">
+              <span className="eyebrow">Our Demo Websites</span>
+              <h2>See premium website concepts for businesses that need to stand out.</h2>
+            </div>
+
+            <div className="portfolio-grid">
+              {portfolioProjects.map((project) => (
+                <article className="demo-card" key={project.name}>
+                  <div className="demo-browser" style={{ '--accent': project.accent }}>
+                    <div className="browser-bar">
+                      <span className="dot red" />
+                      <span className="dot yellow" />
+                      <span className="dot green" />
+                    </div>
+                    <div className="browser-body">
+                      <div className="browser-hero" />
+                      <div className="browser-copy">
+                        <div className="line short" />
+                        <div className="line long" />
+                        <div className="line" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="demo-meta">
+                    <div>
+                      <span>{project.tag}</span>
+                      <h3>{project.name}</h3>
+                    </div>
+                    <button type="button">View Demo</button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="pricing" className="section-wrap reveal">
+          <div className="container">
+            <div className="section-head">
+              <span className="eyebrow">Pricing</span>
+              <h2>Simple packages for businesses ready to grow online.</h2>
+            </div>
+
+            <div className="pricing-grid">
+              {pricingPlans.map((plan) => (
+                <div className={plan.featured ? 'pricing-card featured' : 'pricing-card'} key={plan.name}>
+                  {plan.featured && <span className="badge">Most Popular</span>}
+                  <h3>{plan.name}</h3>
+                  <div className="plan-price">{plan.price}</div>
+                  <ul>
+                    {plan.features.map((feature) => (
+                      <li key={feature}><FaCheck /> {feature}</li>
+                    ))}
+                  </ul>
+                  <a href="#contact" className={plan.featured ? 'primary-btn' : 'secondary-btn'}>
+                    Choose Plan
+                  </a>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="section-wrap reveal">
+          <div className="container">
+            <div className="section-head">
+              <span className="eyebrow">How It Works</span>
+              <h2>From idea to launch in four simple stages.</h2>
+            </div>
+
+            <div className="timeline">
+              {steps.map((step, index) => (
+                <div className="timeline-step" key={step}>
+                  <div className="timeline-no">0{index + 1}</div>
+                  <div className="timeline-line" />
+                  <div className="timeline-content">
+                    <span>{step}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="cta-panel reveal">
+          <div className="container cta-content">
+            <div>
+              <span className="eyebrow">Ready to Grow?</span>
+              <h2>Ready to Take Your Business Online?</h2>
+            </div>
+            <p>Let&apos;s build a website that makes your business impossible to ignore.</p>
+            <div className="hero-actions align-left">
+              <a className="primary-btn" href="#contact">
+                Start Your Website
+                <FaArrowRight />
+              </a>
+              <a className="secondary-btn" href={whatsappLink} target="_blank" rel="noreferrer">
+                Chat on WhatsApp
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section id="contact" className="section-wrap reveal">
+          <div className="container contact-grid">
+            <div className="contact-copy">
+              <span className="eyebrow">Contact</span>
+              <h2>Tell us about your business and we&apos;ll craft the right website.</h2>
+              <p>
+                Whether you need a refined restaurant site, a premium salon brand, a local business website or a conversion-focused landing page, we&apos;ll create something built to win attention and enquiries.
+              </p>
+              <ul className="contact-list">
+                <li><FaPhoneAlt /> +91 98765 43210</li>
+                <li><FaEnvelope /> hello@webora3d.com</li>
+                <li><FaMapMarkerAlt /> Serving businesses across India</li>
+              </ul>
+              <a className="primary-btn whatsapp-btn" href={whatsappLink} target="_blank" rel="noreferrer">
+                <FaWhatsapp /> WhatsApp Us
+              </a>
+            </div>
+
+            <form className="contact-form glass-card" onSubmit={handleSubmit}>
+              <div className="field-grid">
+                <label>
+                  <span>Name</span>
+                  <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Your name" required />
+                </label>
+
+                <label>
+                  <span>Business Name</span>
+                  <input type="text" name="businessName" value={formData.businessName} onChange={handleChange} placeholder="Business name" required />
+                </label>
+
+                <label>
+                  <span>Business Type</span>
+                  <input type="text" name="businessType" value={formData.businessType} onChange={handleChange} placeholder="Restaurant, salon, gym..." required />
+                </label>
+
+                <label>
+                  <span>Phone Number</span>
+                  <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="Your phone number" required />
+                </label>
+
+                <label className="full-width">
+                  <span>What kind of website do you need?</span>
+                  <input type="text" name="need" value={formData.need} onChange={handleChange} placeholder="Business website, restaurant website, ecommerce, etc." required />
+                </label>
+
+                <label className="full-width">
+                  <span>Message</span>
+                  <textarea name="message" value={formData.message} onChange={handleChange} rows="5" placeholder="Tell us about your business goals and requirements..." required />
+                </label>
+              </div>
+
+              <button type="submit" className="primary-btn submit-btn">
+                Send Inquiry
+                <FaArrowRight />
+              </button>
+
+              {submitted && (
+                <p className="success-message">Thanks! Your inquiry has been received. We&apos;ll contact you soon.</p>
+              )}
+            </form>
+          </div>
+        </section>
+      </main>
+
+      <footer className="site-footer">
+        <div className="container footer-wrap">
+          <div>
+            <a className="brand" href="#home">
+              <span className="brand-mark">W</span>
+              <span>Webora 3D</span>
+            </a>
+            <p>Premium websites for ambitious businesses.</p>
+          </div>
+
+          <div className="footer-links">
+            <a href="#home">Home</a>
+            <a href="#services">Services</a>
+            <a href="#portfolio">Portfolio</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#contact">Contact</a>
+          </div>
+
+          <div className="socials" aria-label="Social media links">
+            <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook"><FaFacebookF /></a>
+            <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram"><FaInstagram /></a>
+            <a href="https://wa.me/919876543210" target="_blank" rel="noreferrer" aria-label="WhatsApp"><FaWhatsapp /></a>
+          </div>
+        </div>
+      </footer>
+
+      <a href="#home" className="back-to-top" aria-label="Back to top">
+        <FaArrowUp />
+      </a>
+    </div>
+  );
+}
+
+export default App;
