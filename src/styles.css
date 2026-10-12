@@ -1,615 +1,851 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, Text, Html } from '@react-three/drei';
-import {
-  FaArrowRight,
-  FaCheck,
-  FaChevronRight,
-  FaDesktop,
-  FaEnvelope,
-  FaFacebookF,
-  FaInstagram,
-  FaMapMarkerAlt,
-  FaPhoneAlt,
-  FaRocket,
-  FaSearch,
-  FaStar,
-  FaTachometerAlt,
-  FaWhatsapp,
-  FaGlobe,
-  FaLaptopCode,
-  FaStore,
-  FaUtensils,
-  FaShoppingBag,
-  FaPaintBrush,
-  FaSyncAlt,
-  FaChartLine,
-  FaUsers,
-  FaMobileAlt,
-  FaArrowUp
-} from 'react-icons/fa';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
-const navItems = ['Home', 'Services', 'Portfolio', 'Pricing', 'Contact'];
+:root {
+  --bg: #070b14;
+  --bg-strong: #0d1220;
+  --panel: rgba(15, 21, 35, 0.7);
+  --panel-alt: rgba(19, 27, 41, 0.82);
+  --card: rgba(18, 27, 40, 0.9);
+  --stroke: rgba(255, 255, 255, 0.14);
+  --text: #edf4ff;
+  --muted: #9db2cb;
+  --primary: #7dd3fc;
+  --secondary: #8b5cf6;
+  --accent: #34d399;
+  --shadow: 0 30px 80px rgba(8, 13, 26, 0.7);
+  --radius-xl: 30px;
+  --radius-lg: 22px;
+  --radius-md: 16px;
+  --container: 1200px;
+}
 
-const services = [
-  {
-    title: 'Business Websites',
-    desc: 'Professional websites that build trust, communicate your value and turn visitors into customers.',
-    icon: <FaDesktop />
-  },
-  {
-    title: 'Restaurant & Café Websites',
-    desc: 'Elegant digital storefronts for food brands that need strong menus, reservations and location visibility.',
-    icon: <FaUtensils />
-  },
-  {
-    title: 'E-commerce Websites',
-    desc: 'Convert more sales with beautifully designed stores that are optimized for mobile and customer trust.',
-    icon: <FaShoppingBag />
-  },
-  {
-    title: 'Landing Pages',
-    desc: 'Focused campaign pages built to generate leads, enquiries and calls for your business quickly.',
-    icon: <FaRocket />
-  },
-  {
-    title: 'Portfolio Websites',
-    desc: 'Showcase your work, expertise and brand story with a premium portfolio presentation.',
-    icon: <FaPaintBrush />
-  },
-  {
-    title: 'Website Redesign',
-    desc: 'Refresh a dated website into something modern, faster and more persuasive for real business growth.',
-    icon: <FaSyncAlt />
+* { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top, rgba(125, 211, 252, 0.12), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(139, 92, 246, 0.12), transparent 25%),
+    linear-gradient(180deg, #040813 0%, #070b14 28%, #0b1120 100%);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img { max-width: 100%; display: block; }
+
+button, input, textarea { font: inherit; }
+
+#root { min-height: 100vh; }
+
+.app-shell {
+  position: relative;
+  overflow-x: hidden;
+}
+
+.container {
+  width: min(var(--container), calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.background-glow {
+  position: absolute;
+  width: 34rem;
+  height: 34rem;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.22;
+  pointer-events: none;
+}
+
+.glow-one {
+  top: 8rem;
+  left: -5rem;
+  background: rgba(96, 165, 250, 0.7);
+}
+
+.glow-two {
+  right: -5rem;
+  top: 22rem;
+  background: rgba(168, 85, 247, 0.45);
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  backdrop-filter: blur(18px);
+  background: rgba(7, 11, 20, 0.48);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.nav-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 82px;
+  gap: 1.25rem;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 1.06rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.05rem;
+  height: 2.05rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(125, 211, 252, 0.2), rgba(139, 92, 246, 0.28));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.12), 0 10px 24px rgba(125, 211, 252, 0.15);
+}
+
+.nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.nav-link {
+  position: relative;
+  color: var(--muted);
+  transition: color 0.25s ease;
+  font-size: 0.96rem;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: var(--text);
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -0.5rem;
+  width: 100%;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+}
+
+.nav-cta,
+.primary-btn,
+.secondary-btn,
+.submit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 52px;
+  border-radius: 999px;
+  padding: 0 1.4rem;
+  font-weight: 600;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.nav-cta,
+.primary-btn,
+.submit-btn {
+  border: 1px solid rgba(125, 211, 252, 0.5);
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.18), rgba(139, 92, 246, 0.22));
+  box-shadow: 0 14px 30px rgba(56, 189, 248, 0.14);
+}
+
+.secondary-btn {
+  border: 1px solid var(--stroke);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text);
+}
+
+.nav-cta:hover,
+.primary-btn:hover,
+.secondary-btn:hover,
+.submit-btn:hover {
+  transform: translateY(-2px);
+}
+
+.hero {
+  position: relative;
+  padding: 5rem 0 3rem;
+}
+
+.hero-grid {
+  display: grid;
+  align-items: center;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 2rem;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid rgba(125, 211, 252, 0.2);
+  background: rgba(125, 211, 252, 0.08);
+  color: #dfeeff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.hero-copy h1 {
+  margin: 1.25rem 0 1rem;
+  font-size: clamp(2.9rem, 5vw, 5.2rem);
+  line-height: 0.95;
+  letter-spacing: -0.055em;
+}
+
+.hero-copy p {
+  margin: 0;
+  max-width: 38rem;
+  color: var(--muted);
+  font-size: 1.08rem;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+.align-left { justify-content: flex-start; }
+
+.hero-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-top: 2.2rem;
+  max-width: 36rem;
+}
+
+.hero-metrics div {
+  padding: 1rem 0.9rem;
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.hero-metrics strong {
+  display: block;
+  font-size: 1.4rem;
+}
+
+.hero-metrics span {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.hero-visual {
+  position: relative;
+  height: 650px;
+  border-radius: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(14, 22, 36, 0.9), rgba(8, 11, 18, 0.96));
+  box-shadow: var(--shadow);
+  transform-style: preserve-3d;
+  transition: transform 0.25s ease-out;
+  overflow: hidden;
+}
+
+.scene-frame { position: absolute; inset: 0; }
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(20px);
+  opacity: 0.7;
+}
+
+.orb-one {
+  width: 180px;
+  height: 180px;
+  background: rgba(125, 211, 252, 0.28);
+  top: 2rem;
+  left: 2.5rem;
+}
+
+.orb-two {
+  width: 200px;
+  height: 200px;
+  background: rgba(168, 85, 247, 0.22);
+  bottom: 3rem;
+  right: 3rem;
+}
+
+.orb-three {
+  width: 130px;
+  height: 130px;
+  background: rgba(16, 185, 129, 0.18);
+  bottom: 6.5rem;
+  left: 5rem;
+}
+
+.section-wrap { padding: 3.5rem 0; }
+
+.section-head { margin-bottom: 2rem; }
+
+.section-head h2 {
+  margin: 1rem 0 0;
+  font-size: clamp(2rem, 3vw, 3rem);
+  letter-spacing: -0.05em;
+  max-width: 720px;
+}
+
+.glass-card {
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(19, 28, 43, 0.8), rgba(13, 18, 28, 0.72));
+  box-shadow: 0 28px 60px rgba(4, 8, 18, 0.38);
+  backdrop-filter: blur(18px);
+}
+
+.services-grid,
+.features-grid,
+.portfolio-grid,
+.pricing-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.services-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.service-card {
+  padding: 1.6rem 1.5rem;
+  border-radius: var(--radius-xl);
+  transform-style: preserve-3d;
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.service-card:hover,
+.feature-card:hover,
+.demo-card:hover,
+.pricing-card:hover {
+  transform: translateY(-6px) rotateX(3deg);
+  border-color: rgba(145, 181, 255, 0.28);
+}
+
+.service-icon,
+.feature-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(125,211,252,0.12), rgba(168, 85, 247, 0.18));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 1.1rem;
+  color: var(--primary);
+}
+
+.service-card h3,
+.feature-card h3,
+.demo-meta h3 {
+  margin: 1.2rem 0 0.7rem;
+  font-size: 1.38rem;
+}
+
+.service-card p,
+.feature-card p,
+.contact-copy p,
+.site-footer p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.service-card a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1.2rem;
+  color: #dfeeff;
+  font-weight: 600;
+}
+
+.features-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.feature-card {
+  padding: 1.6rem;
+  border-radius: 26px;
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.portfolio-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.demo-card {
+  padding: 1.1rem;
+  border-radius: 28px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(11, 17, 27, 0.72);
+  box-shadow: var(--shadow);
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.demo-browser {
+  --accent: #7dd3fc;
+  position: relative;
+  height: 250px;
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: linear-gradient(180deg, rgba(16,24,38,1), rgba(13,18,28,1));
+}
+
+.browser-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 2.5rem;
+  padding: 0 0.9rem;
+  background: rgba(20, 28, 39, 0.78);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  display: block;
+}
+
+.dot.red { background: #ff5f57; }
+.dot.yellow { background: #ffbd2f; }
+.dot.green { background: #28c840; }
+
+.browser-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.2rem;
+}
+
+.browser-hero {
+  height: 72px;
+  border-radius: 14px;
+  background: linear-gradient(120deg, rgba(255,255,255,0.08), var(--accent));
+  box-shadow: inset 0 0 50px rgba(255,255,255,0.12);
+}
+
+.browser-copy { display: grid; gap: 0.75rem; }
+
+.line {
+  height: 0.62rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.line.short { width: 42%; }
+.line.long { width: 68%; }
+
+.demo-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 0.4rem 0.25rem;
+}
+
+.demo-meta span {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.demo-meta button {
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.02);
+  color: var(--text);
+  min-height: 2.7rem;
+  border-radius: 999px;
+  padding: 0 1rem;
+}
+
+.pricing-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+.pricing-card {
+  position: relative;
+  padding: 2rem 1.6rem 1.5rem;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(9, 15, 25, 0.76);
+  box-shadow: var(--shadow);
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.pricing-card.featured {
+  border-color: rgba(125, 211, 252, 0.6);
+  background: linear-gradient(180deg, rgba(15, 23, 36, 0.92), rgba(15, 18, 29, 0.8));
+  transform: translateY(-10px);
+}
+
+.badge {
+  position: absolute;
+  right: 1.4rem;
+  top: 1.2rem;
+  padding: 0.42rem 0.7rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(125,211,252,0.18), rgba(139,92,246,0.2));
+  border: 1px solid rgba(125,211,252,0.3);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.pricing-card h3 { margin: 0; font-size: 1.7rem; }
+
+.plan-price {
+  margin-top: 1rem;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+}
+
+.pricing-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.pricing-card li {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: var(--muted);
+}
+
+.pricing-card li svg { color: var(--accent); }
+
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.timeline-step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.8rem;
+}
+
+.timeline-no {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border: 1px solid rgba(125, 211, 252, 0.25);
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(125,211,252,0.08), rgba(139,92,246,0.14));
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #dfeeff;
+}
+
+.timeline-line {
+  width: 2px;
+  height: 3rem;
+  background: linear-gradient(180deg, rgba(125,211,252,0.15), rgba(255,255,255,0.04));
+}
+
+.timeline-content {
+  padding: 1rem 0.85rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.cta-panel { padding: 1.2rem 0 2rem; }
+
+.cta-content {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  align-items: center;
+  gap: 2rem;
+  padding: 2.6rem 2.2rem;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: linear-gradient(135deg, rgba(13,18,28,0.96), rgba(19, 27, 41, 0.92));
+  border-radius: 36px;
+  box-shadow: var(--shadow);
+}
+
+.cta-content h2 {
+  margin: 0.8rem 0 0;
+  font-size: clamp(2.1rem, 3vw, 3rem);
+  letter-spacing: -0.05em;
+}
+
+.cta-content p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.contact-copy h2 {
+  margin: 0.8rem 0 1rem;
+  font-size: clamp(2.1rem, 3vw, 3rem);
+  letter-spacing: -0.05em;
+}
+
+.contact-copy p { margin-bottom: 1.4rem; }
+
+.contact-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.8rem;
+  display: grid;
+  gap: 0.85rem;
+  color: var(--text);
+}
+
+.contact-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: var(--muted);
+}
+
+.contact-list li svg,
+.whatsapp-btn svg { color: var(--accent); }
+
+.contact-form {
+  padding: 1.6rem;
+  border-radius: 30px;
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.1rem;
+}
+
+label {
+  display: grid;
+  gap: 0.55rem;
+  color: var(--text);
+  font-weight: 500;
+}
+
+label span { color: #dfeeff; }
+
+label input,
+label textarea {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  color: var(--text);
+  padding: 0.9rem 1rem;
+  resize: vertical;
+  min-height: 52px;
+}
+
+label input::placeholder,
+label textarea::placeholder {
+  color: rgba(180, 196, 218, 0.78);
+}
+
+.full-width { grid-column: 1 / -1; }
+
+.submit-btn {
+  width: auto;
+  margin-top: 1.2rem;
+  cursor: pointer;
+}
+
+.success-message {
+  margin-top: 1rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.site-footer {
+  padding: 2rem 0 3rem;
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+.footer-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  color: var(--muted);
+}
+
+.socials {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.socials a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: var(--text);
+}
+
+.back-to-top {
+  position: fixed;
+  right: 2rem;
+  bottom: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(125,211,252,0.2), rgba(139,92,246,0.24));
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 16px 30px rgba(76, 115, 255, 0.18);
+  z-index: 35;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 980px) {
+  .hero-grid,
+  .contact-grid,
+  .cta-content,
+  .services-grid,
+  .features-grid,
+  .portfolio-grid,
+  .pricing-grid,
+  .timeline {
+    grid-template-columns: 1fr 1fr;
   }
-];
 
-const featureCards = [
-  { title: 'Modern Design', icon: <FaStar />, text: 'Luxury visuals that elevate your brand image and create instant credibility.' },
-  { title: 'Mobile Responsive', icon: <FaMobileAlt />, text: 'Optimized for every screen so your website looks polished on phone, tablet and desktop.' },
-  { title: 'Fast Loading', icon: <FaTachometerAlt />, text: 'Performance-focused builds that keep your visitors engaged and improve user experience.' },
-  { title: 'SEO Friendly', icon: <FaSearch />, text: 'Clean structure and strategic content that helps people find your business online.' },
-  { title: 'WhatsApp Integration', icon: <FaWhatsapp />, text: 'Turn leads into quick conversations with an instant WhatsApp enquiry option.' },
-  { title: 'Easy to Manage', icon: <FaGlobe />, text: 'Simple updates and easy content management so your site stays fresh and current.' }
-];
-
-const portfolioProjects = [
-  {
-    name: 'Luxury Restaurant',
-    tag: 'Fine Dining',
-    accent: '#ffb26b'
-  },
-  {
-    name: 'Modern Bakery',
-    tag: 'Retail & Food',
-    accent: '#8ec5ff'
-  },
-  {
-    name: 'Fashion Store',
-    tag: 'Boutique',
-    accent: '#f3b4ff'
-  },
-  {
-    name: 'Real Estate',
-    tag: 'Property',
-    accent: '#9ef3d1'
-  },
-  {
-    name: 'Café',
-    tag: 'Hospitality',
-    accent: '#ffc75f'
-  },
-  {
-    name: 'Salon',
-    tag: 'Beauty',
-    accent: '#bca7ff'
+  .hero-grid,
+  .contact-grid,
+  .cta-content {
+    grid-template-columns: 1fr;
   }
-];
 
-const pricingPlans = [
-  {
-    name: 'Starter',
-    price: '₹4,999',
-    featured: false,
-    features: ['1–3 pages', 'Responsive design', 'WhatsApp button', 'Contact form']
-  },
-  {
-    name: 'Business',
-    price: '₹9,999',
-    featured: true,
-    features: ['Up to 7 pages', 'Premium design', 'WhatsApp integration', 'Google Maps', 'Basic SEO']
-  },
-  {
-    name: 'Premium',
-    price: '₹19,999',
-    featured: false,
-    features: ['Custom premium website', 'Advanced animations', 'E-commerce functionality', 'SEO setup', 'Priority support']
+  .hero-visual { height: 540px; }
+}
+
+@media (max-width: 760px) {
+  .nav { display: none; }
+
+  .services-grid,
+  .features-grid,
+  .portfolio-grid,
+  .pricing-grid,
+  .timeline,
+  .field-grid {
+    grid-template-columns: 1fr;
   }
-];
 
-const steps = [
-  'Tell Us About Your Business',
-  'We Design Your Website',
-  'You Review & Approve',
-  'Your Website Goes Live'
-];
-
-function useScrollReveal() {
-  useEffect(() => {
-    const elements = document.querySelectorAll('.reveal');
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-          }
-        });
-      },
-      { threshold: 0.16 }
-    );
-
-    elements.forEach((el) => observer.observe(el));
-
-    return () => observer.disconnect();
-  }, []);
+  .hero { padding-top: 4rem; }
+  .hero-copy h1 { letter-spacing: -0.04em; }
+  .hero-metrics { grid-template-columns: 1fr; }
+  .footer-wrap { flex-direction: column; align-items: flex-start; }
 }
 
-function FloatingScene() {
-  const group = useRef();
-
-  useFrame((state) => {
-    if (!group.current) return;
-    group.current.rotation.y = state.clock.elapsedTime * 0.26;
-    group.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.85) * 0.12;
-  });
-
-  return (
-    <group ref={group}>
-      <Float speed={2.1} rotationIntensity={0.8} floatIntensity={1.3}>
-        <mesh position={[0, 0.2, 0]}>
-          <boxGeometry args={[3.4, 2.1, 0.16]} />
-          <meshStandardMaterial color="#151d2d" metalness={0.5} roughness={0.2} />
-        </mesh>
-        <mesh position={[0, 0.18, 0.09]}>
-          <planeGeometry args={[3.08, 1.82]} />
-          <meshStandardMaterial color="#0b1321" emissive="#0d1730" emissiveIntensity={0.3} />
-        </mesh>
-        <mesh position={[0, -1.35, 0.1]}>
-          <boxGeometry args={[3.7, 0.3, 0.36]} />
-          <meshStandardMaterial color="#10182a" metalness={0.75} roughness={0.18} />
-        </mesh>
-        <mesh position={[0.12, -1.4, 0.25]}>
-          <boxGeometry args={[0.45, 0.1, 0.45]} />
-          <meshStandardMaterial color="#0b0f18" emissive="#4cc9f0" emissiveIntensity={0.18} />
-        </mesh>
-
-        <group position={[-1.1, 0.5, 0.25]}>
-          <mesh>
-            <boxGeometry args={[0.72, 0.4, 0.1]} />
-            <meshStandardMaterial color="#17283d" emissive="#78e1ff" emissiveIntensity={0.2} />
-          </mesh>
-          <mesh position={[0.1, -0.02, 0.06]}>
-            <boxGeometry args={[0.46, 0.22, 0.02]} />
-            <meshStandardMaterial color="#a5d8ff" emissive="#84d2ff" emissiveIntensity={0.6} />
-          </mesh>
-        </group>
-
-        <group position={[1.12, 0.46, 0.25]}>
-          <mesh>
-            <boxGeometry args={[0.8, 0.48, 0.12]} />
-            <meshStandardMaterial color="#1a2539" emissive="#8ef2d6" emissiveIntensity={0.2} />
-          </mesh>
-          <mesh position={[0.08, -0.05, 0.07]}>
-            <boxGeometry args={[0.52, 0.28, 0.03]} />
-            <meshStandardMaterial color="#d9fff5" emissive="#8ef2d6" emissiveIntensity={0.8} />
-          </mesh>
-        </group>
-      </Float>
-
-      <Float speed={1.7} rotationIntensity={1.2} floatIntensity={1.8} position={[2.2, 1.2, -1.3]}>
-        <mesh>
-          <icosahedronGeometry args={[0.42, 0]} />
-          <meshStandardMaterial color="#a855f7" emissive="#7c3aed" emissiveIntensity={0.8} />
-        </mesh>
-      </Float>
-
-      <Float speed={1.5} rotationIntensity={1.1} floatIntensity={1.6} position={[-2.2, -1.1, -1.2]}>
-        <mesh>
-          <octahedronGeometry args={[0.38, 0]} />
-          <meshStandardMaterial color="#2dd4bf" emissive="#14b8a6" emissiveIntensity={0.8} />
-        </mesh>
-      </Float>
-
-      <Float speed={1.4} rotationIntensity={1.3} floatIntensity={1.7} position={[0, 2.2, -1.6]}>
-        <mesh>
-          <torusGeometry args={[0.8, 0.08, 16, 100]} />
-          <meshStandardMaterial color="#6ee7ff" emissive="#67e8f9" emissiveIntensity={0.8} />
-        </mesh>
-      </Float>
-    </group>
-  );
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
 }
 
-function HeroScene() {
-  return (
-    <Canvas camera={{ position: [0, 0, 6], fov: 38 }}>
-      <ambientLight intensity={0.9} />
-      <directionalLight position={[5, 4, 5]} intensity={1.15} color="#e5f3ff" />
-      <spotLight position={[-4, 3, 3]} intensity={1.2} angle={0.35} penumbra={1} color="#7dd3fc" />
-      <FloatingScene />
-    </Canvas>
-  );
+@media (max-width: 520px) {
+  .nav-wrap { min-height: 72px; }
+
+  .primary-btn,
+  .secondary-btn,
+  .submit-btn,
+  .nav-cta {
+    width: 100%;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cta-content { padding: 2rem 1.2rem; }
+  .hero-visual { height: 420px; }
 }
 
-function App() {
-  const [activeTab, setActiveTab] = useState('Home');
-  const [formData, setFormData] = useState({
-    name: '',
-    businessName: '',
-    businessType: '',
-    phone: '',
-    need: '',
-    message: ''
-  });
-  const [submitted, setSubmitted] = useState(false);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const heroRef = useRef(null);
-
-  useScrollReveal();
-
-  const whatsappLink = useMemo(
-    () =>
-      'https://wa.me/919876543210?text=' +
-      encodeURIComponent('Hi Webora 3D, I want to build a premium website for my business. Can we discuss my project?'),
-    []
-  );
-
-  const handlePointerMove = (event) => {
-    const rect = heroRef.current?.getBoundingClientRect();
-    if (!rect) return;
-
-    const x = (event.clientX - rect.left) / rect.width;
-    const y = (event.clientY - rect.top) / rect.height;
-
-    setTilt({
-      x: (0.5 - y) * 12,
-      y: (x - 0.5) * 18
-    });
-  };
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    setSubmitted(true);
-  };
-
-  return (
-    <div className="app-shell">
-      <div className="background-glow glow-one" />
-      <div className="background-glow glow-two" />
-
-      <header className="topbar">
-        <div className="container nav-wrap">
-          <a className="brand" href="#home" aria-label="Webora 3D home">
-            <span className="brand-mark">W</span>
-            <span>Webora 3D</span>
-          </a>
-
-          <nav className="nav" aria-label="Main navigation">
-            {navItems.map((item) => (
-              <a
-                key={item}
-                href={`#${item === 'Home' ? 'home' : item.toLowerCase()}`}
-                className={activeTab === item ? 'nav-link active' : 'nav-link'}
-                onClick={() => setActiveTab(item)}
-              >
-                {item}
-              </a>
-            ))}
-          </nav>
-
-          <a className="nav-cta" href="#contact">
-            Book a Call
-          </a>
-        </div>
-      </header>
-
-      <main>
-        <section id="home" className="hero">
-          <div className="container hero-grid">
-            <div className="hero-copy reveal">
-              <div className="eyebrow">Web Design Studio</div>
-              <h1>We Build Websites That Grow Businesses.</h1>
-              <p>
-                Premium websites designed to make your business look professional, attract customers and grow online.
-              </p>
-              <div className="hero-actions">
-                <a className="primary-btn" href="#contact">
-                  Get Your Website
-                  <FaArrowRight />
-                </a>
-                <a className="secondary-btn" href="#portfolio">
-                  View Our Work
-                </a>
-              </div>
-              <div className="hero-metrics">
-                <div>
-                  <strong>120+</strong>
-                  <span>Projects launched</span>
-                </div>
-                <div>
-                  <strong>3x</strong>
-                  <span>Lead growth</span>
-                </div>
-                <div>
-                  <strong>4.9/5</strong>
-                  <span>Client rating</span>
-                </div>
-              </div>
-            </div>
-
-            <div
-              className="hero-visual reveal"
-              ref={heroRef}
-              onMouseMove={handlePointerMove}
-              onMouseLeave={() => setTilt({ x: 0, y: 0 })}
-              style={{ transform: `perspective(1200px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` }}
-            >
-              <div className="orb orb-one" />
-              <div className="orb orb-two" />
-              <div className="orb orb-three" />
-              <div className="scene-frame">
-                <HeroScene />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="services" className="section-wrap reveal">
-          <div className="container">
-            <div className="section-head">
-              <span className="eyebrow">Our Services</span>
-              <h2>Built to elevate your brand and convert more customers.</h2>
-            </div>
-
-            <div className="services-grid">
-              {services.map((service) => (
-                <article className="service-card glass-card" key={service.title}>
-                  <div className="service-icon">{service.icon}</div>
-                  <h3>{service.title}</h3>
-                  <p>{service.desc}</p>
-                  <a href="#contact">
-                    Learn more <FaChevronRight />
-                  </a>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="section-wrap reveal">
-          <div className="container">
-            <div className="section-head">
-              <span className="eyebrow">Why Choose Us</span>
-              <h2>Premium execution backed by business-first thinking.</h2>
-            </div>
-
-            <div className="features-grid">
-              {featureCards.map((feature) => (
-                <div className="feature-card glass-card" key={feature.title}>
-                  <div className="feature-icon">{feature.icon}</div>
-                  <h3>{feature.title}</h3>
-                  <p>{feature.text}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="portfolio" className="section-wrap reveal">
-          <div className="container">
-            <div className="section-head">
-              <span className="eyebrow">Our Demo Websites</span>
-              <h2>See premium website concepts for businesses that need to stand out.</h2>
-            </div>
-
-            <div className="portfolio-grid">
-              {portfolioProjects.map((project) => (
-                <article className="demo-card" key={project.name}>
-                  <div className="demo-browser" style={{ '--accent': project.accent }}>
-                    <div className="browser-bar">
-                      <span className="dot red" />
-                      <span className="dot yellow" />
-                      <span className="dot green" />
-                    </div>
-                    <div className="browser-body">
-                      <div className="browser-hero" />
-                      <div className="browser-copy">
-                        <div className="line short" />
-                        <div className="line long" />
-                        <div className="line" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="demo-meta">
-                    <div>
-                      <span>{project.tag}</span>
-                      <h3>{project.name}</h3>
-                    </div>
-                    <button type="button">View Demo</button>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="pricing" className="section-wrap reveal">
-          <div className="container">
-            <div className="section-head">
-              <span className="eyebrow">Pricing</span>
-              <h2>Simple packages for businesses ready to grow online.</h2>
-            </div>
-
-            <div className="pricing-grid">
-              {pricingPlans.map((plan) => (
-                <div className={plan.featured ? 'pricing-card featured' : 'pricing-card'} key={plan.name}>
-                  {plan.featured && <span className="badge">Most Popular</span>}
-                  <h3>{plan.name}</h3>
-                  <div className="plan-price">{plan.price}</div>
-                  <ul>
-                    {plan.features.map((feature) => (
-                      <li key={feature}><FaCheck /> {feature}</li>
-                    ))}
-                  </ul>
-                  <a href="#contact" className={plan.featured ? 'primary-btn' : 'secondary-btn'}>
-                    Choose Plan
-                  </a>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="section-wrap reveal">
-          <div className="container">
-            <div className="section-head">
-              <span className="eyebrow">How It Works</span>
-              <h2>From idea to launch in four simple stages.</h2>
-            </div>
-
-            <div className="timeline">
-              {steps.map((step, index) => (
-                <div className="timeline-step" key={step}>
-                  <div className="timeline-no">0{index + 1}</div>
-                  <div className="timeline-line" />
-                  <div className="timeline-content">
-                    <span>{step}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="cta-panel reveal">
-          <div className="container cta-content">
-            <div>
-              <span className="eyebrow">Ready to Grow?</span>
-              <h2>Ready to Take Your Business Online?</h2>
-            </div>
-            <p>Let&apos;s build a website that makes your business impossible to ignore.</p>
-            <div className="hero-actions align-left">
-              <a className="primary-btn" href="#contact">
-                Start Your Website
-                <FaArrowRight />
-              </a>
-              <a className="secondary-btn" href={whatsappLink} target="_blank" rel="noreferrer">
-                Chat on WhatsApp
-              </a>
-            </div>
-          </div>
-        </section>
-
-        <section id="contact" className="section-wrap reveal">
-          <div className="container contact-grid">
-            <div className="contact-copy">
-              <span className="eyebrow">Contact</span>
-              <h2>Tell us about your business and we&apos;ll craft the right website.</h2>
-              <p>
-                Whether you need a refined restaurant site, a premium salon brand, a local business website or a conversion-focused landing page, we&apos;ll create something built to win attention and enquiries.
-              </p>
-              <ul className="contact-list">
-                <li><FaPhoneAlt /> +91 98765 43210</li>
-                <li><FaEnvelope /> hello@webora3d.com</li>
-                <li><FaMapMarkerAlt /> Serving businesses across India</li>
-              </ul>
-              <a className="primary-btn whatsapp-btn" href={whatsappLink} target="_blank" rel="noreferrer">
-                <FaWhatsapp /> WhatsApp Us
-              </a>
-            </div>
-
-            <form className="contact-form glass-card" onSubmit={handleSubmit}>
-              <div className="field-grid">
-                <label>
-                  <span>Name</span>
-                  <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Your name" required />
-                </label>
-
-                <label>
-                  <span>Business Name</span>
-                  <input type="text" name="businessName" value={formData.businessName} onChange={handleChange} placeholder="Business name" required />
-                </label>
-
-                <label>
-                  <span>Business Type</span>
-                  <input type="text" name="businessType" value={formData.businessType} onChange={handleChange} placeholder="Restaurant, salon, gym..." required />
-                </label>
-
-                <label>
-                  <span>Phone Number</span>
-                  <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="Your phone number" required />
-                </label>
-
-                <label className="full-width">
-                  <span>What kind of website do you need?</span>
-                  <input type="text" name="need" value={formData.need} onChange={handleChange} placeholder="Business website, restaurant website, ecommerce, etc." required />
-                </label>
-
-                <label className="full-width">
-                  <span>Message</span>
-                  <textarea name="message" value={formData.message} onChange={handleChange} rows="5" placeholder="Tell us about your business goals and requirements..." required />
-                </label>
-              </div>
-
-              <button type="submit" className="primary-btn submit-btn">
-                Send Inquiry
-                <FaArrowRight />
-              </button>
-
-              {submitted && (
-                <p className="success-message">Thanks! Your inquiry has been received. We&apos;ll contact you soon.</p>
-              )}
-            </form>
-          </div>
-        </section>
-      </main>
-
-      <footer className="site-footer">
-        <div className="container footer-wrap">
-          <div>
-            <a className="brand" href="#home">
-              <span className="brand-mark">W</span>
-              <span>Webora 3D</span>
-            </a>
-            <p>Premium websites for ambitious businesses.</p>
-          </div>
-
-          <div className="footer-links">
-            <a href="#home">Home</a>
-            <a href="#services">Services</a>
-            <a href="#portfolio">Portfolio</a>
-            <a href="#pricing">Pricing</a>
-            <a href="#contact">Contact</a>
-          </div>
-
-          <div className="socials" aria-label="Social media links">
-            <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook"><FaFacebookF /></a>
-            <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram"><FaInstagram /></a>
-            <a href="https://wa.me/919876543210" target="_blank" rel="noreferrer" aria-label="WhatsApp"><FaWhatsapp /></a>
-          </div>
-        </div>
-      </footer>
-
-      <a href="#home" className="back-to-top" aria-label="Back to top">
-        <FaArrowUp />
-      </a>
-    </div>
-  );
+::selection {
+  background: rgba(125, 211, 252, 0.34);
+  color: white;
 }
 
-export default App;
+*::-webkit-scrollbar { width: 10px; }
+*::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); }
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(125,211,252,0.45), rgba(139,92,246,0.46));
+  border-radius: 999px;
+}
